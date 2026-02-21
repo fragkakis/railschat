@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["messages", "input", "submit", "form"]
+  static targets = ["messages", "input", "submit", "form", "model"]
   static values = { url: String }
 
   connect() {
@@ -133,6 +133,22 @@ export default class extends Controller {
   onDone() {
     this.submitTarget.disabled = false
     this.inputTarget.focus()
+  }
+
+  async changeModel() {
+    const modelId = this.modelTarget.value
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+    const url = this.urlValue.replace(/\/messages$/, "")
+
+    await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRF-Token": csrfToken,
+        "Accept": "text/vnd.turbo-stream.html"
+      },
+      body: new URLSearchParams({ model_id: modelId })
+    })
   }
 
   scrollToBottom() {
