@@ -1,8 +1,15 @@
-<div class="flex h-screen">
+<div class="flex h-screen" data-controller="sidebar">
+  <%# Mobile overlay %>
+  <div data-sidebar-target="overlay" data-action="click->sidebar#close" class="hidden fixed inset-0 bg-black/30 z-20 md:hidden"></div>
+
   <%# Sidebar %>
-  <div class="w-64 bg-[#f9f9f9] flex flex-col shrink-0 border-r border-gray-200">
-    <div class="p-2">
-      <%= form_with url: conversations_path, method: :post, id: "new-chat-form" do |f| %>
+  <div data-sidebar-target="sidebar" class="fixed inset-y-0 left-0 z-30 w-72 bg-[#f9f9f9] flex flex-col border-r border-gray-200 -translate-x-full transition-transform duration-200 ease-in-out md:relative md:translate-x-0 md:w-64 md:shrink-0">
+    <div class="p-2 flex items-center gap-2">
+      <%# Close button (mobile only) %>
+      <button data-action="click->sidebar#close" class="md:hidden p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-200 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <%= form_with url: conversations_path, method: :post, id: "new-chat-form", class: "flex-1" do |f| %>
         <input type="hidden" name="model_id" id="new-chat-model-id" value="<%= @conversation&.model_id || Conversation::MODELS.values.first.first[:id] %>">
         <button type="submit" class="w-full flex items-center gap-2 text-base text-gray-700 hover:bg-gray-200 rounded-lg px-3 py-3 transition">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -57,8 +64,22 @@
 
   <%# Main Chat Area %>
   <div class="flex-1 flex flex-col min-w-0 bg-white">
+    <%# Mobile header %>
+    <div class="md:hidden flex items-center justify-between px-3 py-2 border-b border-gray-100">
+      <button data-action="click->sidebar#open" class="p-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <span class="text-sm font-medium text-gray-600 truncate max-w-[50%]"><%= @conversation&.title || "Rails AI Chat" %></span>
+      <%= form_with url: conversations_path, method: :post, class: "inline" do |f| %>
+        <input type="hidden" name="model_id" value="<%= @conversation&.model_id || Conversation::MODELS.values.first.first[:id] %>">
+        <button type="submit" class="p-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      <% end %>
+    </div>
+
     <% if @conversation %>
-      <div class="flex flex-col h-full" data-controller="chat" data-chat-url-value="<%= conversation_messages_path(@conversation) %>">
+      <div class="flex flex-col flex-1 min-h-0" data-controller="chat" data-chat-url-value="<%= conversation_messages_path(@conversation) %>">
         <%# Messages %>
         <div class="flex-1 overflow-y-auto" data-chat-target="messages">
           <% @messages.each do |message| %>
@@ -67,7 +88,7 @@
         </div>
 
         <%# Input Area %>
-        <div class="pb-6 pt-2 px-4">
+        <div class="pb-4 md:pb-6 pt-2 px-3 md:px-4">
           <div class="max-w-3xl mx-auto">
             <form data-action="submit->chat#send" data-chat-target="form" class="bg-[#f4f4f4] rounded-2xl">
               <textarea
@@ -96,7 +117,7 @@
         </div>
       </div>
     <% else %>
-      <div class="flex-1 flex flex-col items-center justify-center">
+      <div class="flex-1 flex flex-col items-center justify-center px-4">
         <h1 class="text-2xl font-semibold text-gray-800 mb-8">What can I help with?</h1>
         <div>
           <select id="landing-model-select" onchange="document.getElementById('new-chat-model-id').value = this.value" class="bg-[#f4f4f4] text-gray-600 text-sm rounded-lg px-3 py-2 border-0 focus:outline-none focus:ring-1 focus:ring-gray-300 cursor-pointer">

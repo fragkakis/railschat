@@ -35,6 +35,8 @@ class Conversation < ApplicationRecord
   end
 
   def requires_api_key?
-    !FREE_PROVIDERS.include?(provider_name)
+    provider = provider_name
+    return false if provider.nil?
+    !FREE_PROVIDERS.include?(provider)
   end
 end

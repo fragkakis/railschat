@@ -47,7 +47,7 @@ export default class extends Controller {
     row.className = "py-4"
 
     const container = document.createElement("div")
-    container.className = "max-w-3xl mx-auto px-4 flex gap-4"
+    container.className = "max-w-3xl mx-auto px-3 md:px-4 flex gap-3 md:gap-4"
 
     if (role === "assistant") {
       const avatar = document.createElement("div")
