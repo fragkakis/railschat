@@ -1,5 +1,5 @@
 # Name of your application. Used to uniquely configure containers.
-service: railschat
+service: rails_ai
 
 # Name of the container image.
 image: fragkakis/railschat
