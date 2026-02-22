@@ -1,8 +1,8 @@
 # Name of your application. Used to uniquely configure containers.
-service: rails_ai
+service: railschat
 
 # Name of the container image.
-image: fragkakis/rails_ai
+image: fragkakis/railschat
 
 # Deploy to these servers.
 servers:
