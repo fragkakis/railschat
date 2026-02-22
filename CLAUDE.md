@@ -1,6 +1,6 @@
 # Rails AI Chat
 
-ChatGPT clone built on Rails 8 with ruby_llm gem. Multi-user via session isolation, no auth.
+ChatGPT clone built on Rails 8 with ruby_llm gem. Multi-user via session isolation, no auth. Mobile and desktop friendly.
 
 ## Architecture
 

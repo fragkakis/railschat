@@ -106,8 +106,13 @@ export default class extends Controller {
 
     const provider = this.getSelectedProvider()
     const inputTarget = provider === "OpenAI" ? "openaiInput" : "mistralInput"
-    const input = document.querySelector(`[data-api-keys-target="${inputTarget}"]`)
-    if (input) input.focus()
+    requestAnimationFrame(() => {
+      const input = document.querySelector(`[data-api-keys-target="${inputTarget}"]`)
+      if (input) {
+        input.scrollIntoView({ behavior: "smooth", block: "center" })
+        input.focus()
+      }
+    })
   }
 
   async streamResponse(content, textEl) {
@@ -188,24 +193,12 @@ export default class extends Controller {
     this.inputTarget.focus()
   }
 
-  async changeModel() {
+  changeModel(event) {
+    event.stopPropagation()
+
     if (this.requiresKeyWithout()) {
       this.openKeysPanel()
     }
-
-    const modelId = this.modelTarget.value
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
-    const url = this.urlValue.replace(/\/messages$/, "")
-
-    await fetch(url, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRF-Token": csrfToken,
-        "Accept": "text/vnd.turbo-stream.html"
-      },
-      body: new URLSearchParams({ model_id: modelId })
-    })
   }
 
   scrollToBottom() {

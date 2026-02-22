@@ -20,6 +20,7 @@ class ConversationsController < ApplicationController
   def update
     conversation = Conversation.for_session(current_session_id).find(params[:id])
     conversation.update!(model_id: params[:model_id])
+
     redirect_to conversation_path(conversation)
   end
 
