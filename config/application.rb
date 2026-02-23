@@ -16,7 +16,7 @@ module RailsAi
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    config.filter_parameters += [:api_key, "X-Api-Key"]
+    config.filter_parameters += [ :api_key, "X-Api-Key" ]
 
     # Configuration for the application, engines, and railties goes here.
     #
