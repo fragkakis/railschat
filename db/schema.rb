@@ -10,14 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_22_183625) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_23_214413) do
   create_table "conversations", force: :cascade do |t|
     t.string "title"
     t.string "model_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "session_id"
+    t.string "uuid", null: false
     t.index ["session_id"], name: "index_conversations_on_session_id"
+    t.index ["uuid"], name: "index_conversations_on_uuid", unique: true
   end
 
   create_table "messages", force: :cascade do |t|

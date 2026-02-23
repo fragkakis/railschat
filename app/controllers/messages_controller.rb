@@ -2,7 +2,7 @@ class MessagesController < ApplicationController
   include ActionController::Live
 
   def create
-    @conversation = Conversation.for_session(current_session_id).find(params[:conversation_id])
+    @conversation = Conversation.for_session(current_session_id).find_by!(uuid: params[:conversation_id])
     content = params[:content]
 
     # Save user message

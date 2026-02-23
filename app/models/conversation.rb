@@ -22,7 +22,14 @@ class Conversation < ApplicationRecord
 
   has_many :messages, dependent: :destroy
 
+  before_create { self.uuid = SecureRandom.uuid if uuid.blank? }
+
   validates :model_id, presence: true
+  validates :uuid, presence: true, uniqueness: true
+
+  def to_param
+    uuid
+  end
 
   scope :ordered, -> { order(updated_at: :desc) }
   scope :for_session, ->(sid) { where(session_id: sid) }
