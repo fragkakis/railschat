@@ -3,6 +3,14 @@
   <head>
     <title><%= content_for(:title) || "Rails AI Chat" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Free AI chat powered by Gemini, with support for OpenAI and Mistral via your own API keys. Built with Rails.">
+    <meta property="og:title" content="Rails AI Chat">
+    <meta property="og:description" content="Free AI chat powered by Gemini, with support for OpenAI and Mistral via your own API keys. Built with Rails.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= request.original_url %>">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rails AI Chat">
+    <meta name="twitter:description" content="Free AI chat powered by Gemini, with support for OpenAI and Mistral via your own API keys. Built with Rails.">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
