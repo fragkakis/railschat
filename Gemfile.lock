@@ -168,8 +168,9 @@ GEM
     marcel (1.1.0)
     matrix (0.4.3)
     mini_mime (1.1.5)
-    minitest (6.0.1)
-      prism (~> 1.5)
+    minitest (5.27.0)
+    mocha (2.8.2)
+      ruby2_keywords (>= 0.0.5)
     msgpack (1.8.0)
     multipart-post (2.4.1)
     net-http (0.9.1)
@@ -303,6 +304,7 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
+    ruby2_keywords (0.0.5)
     ruby_llm (1.12.1)
       base64
       event_stream_parser (~> 1)
@@ -418,6 +420,8 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
+  minitest (~> 5.0)
+  mocha (~> 2.0)
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.2, >= 8.0.2.1)

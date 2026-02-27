@@ -1,0 +1,17 @@
+gemini_chat:
+  title: "Gemini Chat"
+  model_id: "gemini-2.5-flash"
+  session_id: "session_abc123"
+  uuid: "550e8400-e29b-41d4-a716-446655440001"
+
+openai_chat:
+  title: "OpenAI Chat"
+  model_id: "gpt-4o"
+  session_id: "session_abc123"
+  uuid: "550e8400-e29b-41d4-a716-446655440002"
+
+other_session_chat:
+  title: "Other Session Chat"
+  model_id: "mistral-large-latest"
+  session_id: "session_xyz999"
+  uuid: "550e8400-e29b-41d4-a716-446655440003"

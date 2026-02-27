@@ -1,0 +1,14 @@
+gemini_user_msg:
+  conversation: gemini_chat
+  role: "user"
+  content: "Hello, how are you?"
+
+gemini_assistant_msg:
+  conversation: gemini_chat
+  role: "assistant"
+  content: "I am doing well, thank you!"
+
+openai_user_msg:
+  conversation: openai_chat
+  role: "user"
+  content: "Tell me about AI"
