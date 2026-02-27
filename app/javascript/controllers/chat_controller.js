@@ -1,4 +1,85 @@
 import { Controller } from "@hotwired/stimulus"
+import { marked } from "marked"
+import DOMPurify from "dompurify"
+
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+  highlight: null
+})
+
+function balanceCodeFences(text) {
+  const lines = text.split('\n')
+  const fenceRegex = /^(`{3,})(.*)$/
+
+  // Identify all fence marker lines
+  const markers = []
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(fenceRegex)
+    if (m) {
+      markers.push({
+        index: i,
+        len: m[1].length,
+        suffix: m[2],
+        isBare: m[2].trim() === ''
+      })
+    }
+  }
+
+  // Pair fences using a stack (simulating intended nesting)
+  const stack = []
+  const pairs = []
+  for (const fm of markers) {
+    if (stack.length > 0 && fm.isBare && fm.len >= stack[stack.length - 1].len) {
+      pairs.push({ open: stack.pop(), close: fm })
+    } else {
+      stack.push(fm)
+    }
+  }
+
+  // Close any remaining unclosed fences (handles streaming)
+  while (stack.length > 0) {
+    const opener = stack.pop()
+    const closeIndex = lines.length
+    lines.push('`'.repeat(opener.len))
+    pairs.push({
+      open: opener,
+      close: { index: closeIndex, len: opener.len, suffix: '', isBare: true }
+    })
+  }
+
+  // Fix nested pairs by increasing outer fence backtick counts
+  let changed = true
+  while (changed) {
+    changed = false
+    for (const outer of pairs) {
+      let maxInnerLen = 0
+      for (const inner of pairs) {
+        if (inner !== outer &&
+            inner.open.index > outer.open.index &&
+            inner.close.index < outer.close.index) {
+          maxInnerLen = Math.max(maxInnerLen, inner.open.len, inner.close.len)
+        }
+      }
+      if (maxInnerLen > 0 && outer.open.len <= maxInnerLen) {
+        const newLen = maxInnerLen + 1
+        const newBackticks = '`'.repeat(newLen)
+        lines[outer.open.index] = newBackticks + outer.open.suffix
+        lines[outer.close.index] = newBackticks
+        outer.open.len = newLen
+        outer.close.len = newLen
+        changed = true
+      }
+    }
+  }
+
+  return lines.join('\n')
+}
+
+function renderMarkdown(text) {
+  const raw = marked.parse(balanceCodeFences(text))
+  return DOMPurify.sanitize(raw)
+}
 
 export default class extends Controller {
   static targets = ["messages", "input", "submit", "form", "model"]
@@ -6,7 +87,17 @@ export default class extends Controller {
 
   connect() {
     this.autoResize()
+    this.renderExistingMessages()
     this.sendInitialContent()
+  }
+
+  renderExistingMessages() {
+    this.messagesTarget.querySelectorAll('[data-role="assistant"]').forEach(el => {
+      const raw = el.textContent
+      if (raw.trim()) {
+        el.innerHTML = renderMarkdown(raw)
+      }
+    })
   }
 
   sendInitialContent() {
@@ -80,8 +171,16 @@ export default class extends Controller {
     }
 
     const textDiv = document.createElement("div")
-    textDiv.className = "text-base leading-7 text-gray-800 whitespace-pre-wrap"
-    textDiv.textContent = content
+    textDiv.setAttribute("data-role", role)
+    if (role === "user") {
+      textDiv.className = "text-base leading-7 text-gray-800 whitespace-pre-wrap"
+      textDiv.textContent = content
+    } else {
+      textDiv.className = "text-base leading-7 text-gray-800 markdown-body"
+      if (content) {
+        textDiv.innerHTML = renderMarkdown(content)
+      }
+    }
 
     messageDiv.appendChild(textDiv)
     container.appendChild(messageDiv)
@@ -143,6 +242,8 @@ export default class extends Controller {
       headers["X-Api-Key"] = apiKey
     }
 
+    let rawMarkdown = ""
+
     try {
       const response = await fetch(this.urlValue, {
         method: "POST",
@@ -182,7 +283,8 @@ export default class extends Controller {
             try {
               const data = JSON.parse(line.slice(6))
               if (data.content) {
-                textEl.textContent += data.content
+                rawMarkdown += data.content
+                textEl.innerHTML = renderMarkdown(rawMarkdown)
                 this.scrollToBottom()
               }
               if (data.message) {
