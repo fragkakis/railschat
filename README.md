@@ -9,6 +9,12 @@ A ChatGPT-style chat interface built with Rails 8 and the [ruby_llm](https://git
 - **Bring Your Own Key (BYOK)** — OpenAI and Mistral keys are stored in browser localStorage and sent per-request (never persisted server-side)
 - **Session-based isolation** — Each browser session gets its own conversation history, no authentication required
 - **Model switching** — Change models mid-conversation from the input area
+- **Markdown rendering** — Assistant responses are rendered as rich markdown (headings, code blocks, lists, etc.)
+- **Dark mode** — Automatic detection of system preference with dark/light theme support
+- **Copy to clipboard** — One-click copying of assistant messages
+- **Retry messages** — Regenerate the last assistant response
+- **Abort streaming** — Cancel an in-progress response at any time
+- **Async chat titles** — Conversation titles are generated automatically in the background
 - **Mobile friendly** — Responsive master-detail layout
 
 ## Tech Stack
