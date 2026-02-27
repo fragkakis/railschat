@@ -48,8 +48,20 @@ class MessagesController < ApplicationController
 
       @conversation.messages.create!(role: "assistant", content: assistant_content)
       response.stream.write("event: done\ndata: {}\n\n")
+    rescue ActionController::Live::ClientDisconnected
+      # Client aborted — save partial response
+      if assistant_content.present?
+        @conversation.messages.create!(role: "assistant", content: assistant_content)
+      end
     rescue => e
-      response.stream.write("event: error\ndata: #{{ message: e.message }.to_json}\n\n")
+      begin
+        response.stream.write("event: error\ndata: #{{ message: e.message }.to_json}\n\n")
+      rescue ActionController::Live::ClientDisconnected
+        # Client already gone during error reporting — save what we have
+        if assistant_content.present?
+          @conversation.messages.create!(role: "assistant", content: assistant_content)
+        end
+      end
     ensure
       response.stream.close
     end

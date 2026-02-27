@@ -82,7 +82,7 @@ function renderMarkdown(text) {
 }
 
 export default class extends Controller {
-  static targets = ["messages", "input", "submit", "form", "model"]
+  static targets = ["messages", "input", "submit", "form", "model", "stop"]
   static values = { url: String }
 
   connect() {
@@ -112,6 +112,8 @@ export default class extends Controller {
     this.appendMessage("user", content)
     const contentEl = this.appendMessage("assistant", "")
     this.submitTarget.disabled = true
+    this.submitTarget.classList.add("hidden")
+    this.stopTarget.classList.remove("hidden")
     this.streamResponse(content, contentEl)
   }
 
@@ -129,11 +131,20 @@ export default class extends Controller {
     this.inputTarget.value = ""
     this.inputTarget.style.height = "auto"
     this.submitTarget.disabled = true
+    this.submitTarget.classList.add("hidden")
+    this.stopTarget.classList.remove("hidden")
 
     this.appendMessage("user", content)
     const contentEl = this.appendMessage("assistant", "")
 
     this.streamResponse(content, contentEl)
+  }
+
+  stop() {
+    if (this.abortController) {
+      this.abortController.abort()
+      this.abortController = null
+    }
   }
 
   keydown(event) {
@@ -244,11 +255,14 @@ export default class extends Controller {
 
     let rawMarkdown = ""
 
+    this.abortController = new AbortController()
+
     try {
       const response = await fetch(this.urlValue, {
         method: "POST",
         headers,
-        body: new URLSearchParams({ content })
+        body: new URLSearchParams({ content }),
+        signal: this.abortController.signal
       })
 
       // Handle non-SSE error responses (e.g. 422 for missing API key)
@@ -301,6 +315,10 @@ export default class extends Controller {
 
       this.onDone()
     } catch (error) {
+      if (error.name === "AbortError") {
+        this.onDone()
+        return
+      }
       textEl.textContent = `Error: ${error.message}`
       this.onDone()
     }
@@ -308,6 +326,9 @@ export default class extends Controller {
 
   onDone() {
     this.submitTarget.disabled = false
+    this.submitTarget.classList.remove("hidden")
+    this.stopTarget.classList.add("hidden")
+    this.abortController = null
     this.inputTarget.focus()
   }
 
